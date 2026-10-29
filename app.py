@@ -21,13 +21,13 @@ TASKS = {
         "name": "Úloha 1: Sčítání dvou čísel", 
         "desc": "Napište program, který vyzve k zadání dvoch celých čísel ze stdin a vytiskne jejich součet.",
         "points": 3,
-        "sample_combined": "Zadejte dve cisla:\n<b>5 10</b>\nSoucet: <b>15</b>"
+        "sample_combined": "<b>Zadejte dve cisla:</b>\n5 10\n<b>Soucet: 15</b>"
     },
     "02_serazeni_pole": {
         "name": "Úloha 3: Seřazení čísel", 
         "desc": "Napište program, který načte počet čísel N, následně N celých čísel a vytiskne je seřazená vzestupně.\nOšetřete nesprávné vstupy. Předávejte je na standartní výstup (Ne chybový) Nezapomeňte na bílé znaky na konci výpisů.",
         "points": 7,
-        "sample_combined": "Zadejte delku:\n<b>3</b>\nZadejte cisla:\n<b>15 3 8</b>\nSerazena posloupnost:\n<b>3 8 15</b>"
+        "sample_combined": "<b>Zadejte delku:</b>\n3\n<b>Zadejte cisla:</b>\n15 3 8\n<b>Serazena posloupnost:\n3 8 15</b>"
     }
 }
 
