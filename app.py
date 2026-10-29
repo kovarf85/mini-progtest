@@ -14,13 +14,8 @@ ALLOWED_USERS = ["Kovy", "Rajchy"]
 TASKS = {
     "01_scitani": {
         "name": "Úloha 1: Sčítání dvou čísel", 
-        "desc": "Napište program, který načte dvě celá čísla ze stdin a vytiskne jejich součet.",
+        "desc": "Napište program, který načte dvě celá čísla ze stdin a vytiskne jejich součet.\n Testovací data(vstupní data >, výstupni data <):\n> 5 10\n< 15",
         "points": 3
-    },
-    "02_nasobeni": {
-        "name": "Úloha 2: Násobení dvou čísel", 
-        "desc": "Napište program, který načte dvě celá čísla ze stdin a vytiskne jejich součin.",
-        "points": 5
     }
 }
 
@@ -76,6 +71,7 @@ def index():
             user_code = file.read().decode("utf-8", errors="ignore")
 
         if user_code:
+            os.makedirs("temp", exist_ok=True)
             temp_code_path = os.path.join("temp", "solution.c")
             with open(temp_code_path, "w", encoding="utf-8") as f:
                 f.write(user_code)
