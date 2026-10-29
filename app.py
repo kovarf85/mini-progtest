@@ -8,7 +8,7 @@ app.secret_key = "mini_progtest_tajny_klic_123"
 
 RESULTS_FILE = "results.json"
 
-ALLOWED_USERS = ["Kovy":"8545", "Rajchy": "4585"]
+USERS = {"Kovy":"8545", "Rajchy": "4585"}
 
 # DEFINICE ÚLOH S BODOVÝM OHODNOCENÍM
 TASKS = {
