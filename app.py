@@ -8,7 +8,7 @@ app.secret_key = "mini_progtest_tajny_klic_123"
 
 RESULTS_FILE = "results.json"
 
-ALLOWED_USERS = ["Kovy", "Rajchy"]
+ALLOWED_USERS = ["Kovy":"8545", "Rajchy": "4585"]
 
 # DEFINICE ÚLOH S BODOVÝM OHODNOCENÍM
 TASKS = {
@@ -36,11 +36,14 @@ def login():
     error = None
     if request.method == "POST":
         username = request.form.get("username", "").strip()
-        if username in ALLOWED_USERS:
+        password = request.form.get("password", "").strip()
+
+        # Kontrola, zda uživatel existuje a heslo souhlasí
+        if username in USERS and USERS[username] == password:
             session["username"] = username
             return redirect(url_for("index"))
         else:
-            error = "Neplatné uživatelské jméno! Zkontrolujte seznam povolených studentů."
+            error = "Neplatné uživatelské jméno nebo heslo!"
 
     return render_template("login.html", error=error)
 
@@ -117,7 +120,7 @@ def leaderboard():
     results = load_results()
     leaderboard_data = []
 
-    for user in ALLOWED_USERS:
+    for user in USERS.keys():
         user_task_results = results.get(user, {})
         total_points = 0
         task_points = {}
