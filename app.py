@@ -14,8 +14,10 @@ ALLOWED_USERS = ["Kovy", "Rajchy"]
 TASKS = {
     "01_scitani": {
         "name": "Úloha 1: Sčítání dvou čísel", 
-        "desc": "Napište program, který načte dvě celá čísla ze stdin a vytiskne jejich součet.\n Testovací data(vstupní data >, výstupni data <):\n> 5 10\n< 15",
-        "points": 3
+        "desc": "Napište program, který načte dvě celá čísla ze stdin a vytiskne jejich součet.",
+        "points": 3,
+        "sample_in": "5 10",
+        "sample_out": "15"
     }
 }
 
@@ -60,18 +62,17 @@ def index():
 
     results = load_results()
     result_output = None
-    user_code = ""
 
     if request.method == "POST":
         selected_task = request.form.get("task", selected_task)
-        user_code = request.form.get("code", "")
         file = request.files.get("file_upload")
 
         if file and file.filename != "":
             user_code = file.read().decode("utf-8", errors="ignore")
 
-        if user_code:
+            # Automatické vytvoření složky temp
             os.makedirs("temp", exist_ok=True)
+
             temp_code_path = os.path.join("temp", "solution.c")
             with open(temp_code_path, "w", encoding="utf-8") as f:
                 f.write(user_code)
@@ -96,17 +97,17 @@ def index():
 
             except Exception as e:
                 result_output = f"Chyba při spouštění testeru: {str(e)}"
+        else:
+            result_output = "Chyba: Nebyl vybrán žádný soubor k odevzdání!"
 
     return render_template(
         "index.html",
         tasks=TASKS,
         selected_task=selected_task,
         username=username,
-        user_code=user_code,
         result_output=result_output,
         user_results=results.get(username, {})
     )
-
 # NOVÁ RUTA PRO LEADERBOARD (ŽEBŘÍČEK)
 @app.route("/leaderboard")
 def leaderboard():

@@ -21,11 +21,15 @@
         .badge-pending { background: #e74c3c; color: white; }
         .pts-tag { background: #f1c40f; color: #333; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-left: 5px; }
 
-        input[type="file"], textarea, button { width: 100%; margin-top: 8px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
-        textarea { font-family: 'Courier New', Courier, monospace; height: 180px; resize: vertical; }
+        /* Styl pro ukázkové testy */
+        .sample-box { display: flex; gap: 15px; margin: 15px 0; }
+        .sample-col { flex: 1; }
+        .sample-code { background: #272822; color: #f8f8f2; padding: 10px; border-radius: 5px; font-family: 'Courier New', Courier, monospace; margin-top: 5px; white-space: pre-wrap; }
+
+        input[type="file"], button { width: 100%; margin-top: 8px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
         button { background-color: #3498db; color: white; font-weight: bold; border: none; cursor: pointer; margin-top: 15px; font-size: 16px; }
         button:hover { background-color: #2980b9; }
-        pre { background-color: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 5px; overflow-x: auto; font-family: 'Courier New', Courier, monospace; }
+        pre.result-box { background-color: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 5px; overflow-x: auto; font-family: 'Courier New', Courier, monospace; }
     </style>
 </head>
 <body>
@@ -59,15 +63,26 @@
         <h2>{{ tasks[selected_task].name }} ({{ tasks[selected_task].points }} bodů)</h2>
         <p>{{ tasks[selected_task].desc }}</p>
 
+        <!-- Ukázkové vstupy a výstupy -->
+        <div class="sample-box">
+            <div class="sample-col">
+                <strong>Ukázkový vstup (stdin):</strong>
+                <div class="sample-code">{{ tasks[selected_task].sample_in }}</div>
+            </div>
+            <div class="sample-col">
+                <strong>Ukázkový výstup (stdout):</strong>
+                <div class="sample-code">{{ tasks[selected_task].sample_out }}</div>
+            </div>
+        </div>
+
+        <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
         <form method="POST" enctype="multipart/form-data">
             <input type="hidden" name="task" value="{{ selected_task }}">
 
-            <label for="file_upload"><strong>1. Nahrát soubor s kódem (.c / .cpp):</strong></label>
-            <input type="file" name="file_upload" id="file_upload" accept=".c,.cpp">
+            <label for="file_upload"><strong>Nahrát soubor s kódem (.c / .cpp):</strong></label>
+            <input type="file" name="file_upload" id="file_upload" accept=".c,.cpp" required>
 
-            <br><br>
-            <label for="code"><strong>2. Nebo vlož kód přímo sem:</strong></label>
-            <textarea name="code" id="code" placeholder="Vlož sem svůj C kód...">{{ user_code or '#include <stdio.h>\n\nint main(void) {\n    printf("Hello World\\n");\n    return 0;\n}' }}</textarea>
             <button type="submit">Odevzdat k otestování</button>
         </form>
     </div>
@@ -75,7 +90,7 @@
     {% if result_output %}
     <div class="card">
         <h2>Výsledek hodnocení:</h2>
-        <pre>{{ result_output }}</pre>
+        <pre class="result-box">{{ result_output }}</pre>
     </div>
     {% endif %}
 
