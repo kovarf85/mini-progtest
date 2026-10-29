@@ -1,1 +1,2 @@
-15
+Zadejte 2 cisla:
+Soucet: 15
