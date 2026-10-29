@@ -23,7 +23,7 @@ TASKS = {
         "points": 3,
         "sample_combined": "<b>Zadejte dve cisla:</b>\n5 10\n<b>Soucet: 15</b>"
     },
-    "02_serazeni_pole": {
+    "02_razeni": {
         "name": "Úloha 2: Seřazení čísel", 
         "desc": "Napište program, který načte počet čísel N, následně N celých čísel a vytiskne je seřazená vzestupně.\nOšetřete nesprávné vstupy. Předávejte je na standartní výstup (Ne chybový). Nezapomeňte na bílé znaky na konci výpisů.",
         "points": 7,
