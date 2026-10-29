@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Žebříček - Mini Progtest</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 950px; margin: 20px auto; padding: 0 20px; background-color: #f4f6f9; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        h1 { color: #2c3e50; margin: 0; }
+        .nav-btn { background: #3498db; color: white; padding: 10px 15px; border-radius: 5px; text-decoration: none; font-weight: bold; }
+        .nav-btn:hover { background: #2980b9; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
+        th { background-color: #2c3e50; color: white; }
+        tr:hover { background-color: #f1f1f1; }
+        .highlight-me { background-color: #e8f8f5; font-weight: bold; }
+        .points-badge { background: #2ecc71; color: white; padding: 3px 8px; border-radius: 12px; font-weight: bold; }
+        .zero-badge { color: #888; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Žebříček výsledků</h1>
+        <a href="/" class="nav-btn">← Zpět na úlohy</a>
+    </div>
+
+    <div class="card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Pořadí</th>
+                    <th>Student</th>
+                    {% for task_id, task_info in tasks.items() %}
+                        <th>{{ task_info.name }} (max {{ task_info.points }}b)</th>
+                    {% endfor %}
+                    <th>Celkem bodů</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in leaderboard %}
+                <tr class="{% if entry.username == username %}highlight-me{% endif %}">
+                    <td><strong>{{ loop.index }}.</strong></td>
+                    <td>{{ entry.username }} {% if entry.username == username %}(Ty){% endif %}</td>
+                    {% for task_id in tasks.keys() %}
+                        <td>
+                            {% if entry.task_points[task_id] > 0 %}
+                                <span class="points-badge">+{{ entry.task_points[task_id] }} b</span>
+                            {% else %}
+                                <span class="zero-badge">0 b</span>
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                    <td><strong>{{ entry.total_points }} b</strong></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Progtest Evaluator</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 950px; margin: 20px auto; padding: 0 20px; background-color: #f4f6f9; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        h1 { color: #2c3e50; margin: 0; }
+        .user-info { font-size: 15px; background: white; padding: 10px 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .nav-link { color: #3498db; text-decoration: none; font-weight: bold; margin-left: 10px; }
+        .logout-btn { color: #e74c3c; text-decoration: none; font-weight: bold; margin-left: 10px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        
+        .nav-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #ccc; padding-bottom: 10px; }
+        .tab { padding: 10px 15px; background: #e0e0e0; border-radius: 5px; text-decoration: none; color: #333; font-weight: bold; }
+        .tab.active { background: #3498db; color: white; }
+        .badge { padding: 3px 7px; border-radius: 10px; font-size: 12px; margin-left: 5px; }
+        .badge-success { background: #2ecc71; color: white; }
+        .badge-pending { background: #e74c3c; color: white; }
+        .pts-tag { background: #f1c40f; color: #333; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-left: 5px; }
+
+        input[type="file"], textarea, button { width: 100%; margin-top: 8px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+        textarea { font-family: 'Courier New', Courier, monospace; height: 180px; resize: vertical; }
+        button { background-color: #3498db; color: white; font-weight: bold; border: none; cursor: pointer; margin-top: 15px; font-size: 16px; }
+        button:hover { background-color: #2980b9; }
+        pre { background-color: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 5px; overflow-x: auto; font-family: 'Courier New', Courier, monospace; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Mini Progtest Evaluator</h1>
+        <div class="user-info">
+            Přihlášen: <strong>{{ username }}</strong>
+            <a href="/leaderboard" class="nav-link">🏆 Žebříček</a>
+            <a href="/logout" class="logout-btn">[Odhlásit se]</a>
+        </div>
+    </div>
+
+    <!-- Navigace mezi úlohami -->
+    <div class="nav-tabs">
+        {% for task_id, task_info in tasks.items() %}
+            <a href="?task={{ task_id }}" class="tab {% if task_id == selected_task %}active{% endif %}">
+                {{ task_info.name }}
+                <span class="pts-tag">{{ task_info.points }}b</span>
+                {% if user_results.get(task_id) %}
+                    <span class="badge badge-success">✓ Splněno</span>
+                {% else %}
+                    <span class="badge badge-pending">✗ Nesplněno</span>
+                {% endif %}
+            </a>
+        {% endfor %}
+    </div>
+
+    <!-- Hlavní formulář úlohy -->
+    <div class="card">
+        <h2>{{ tasks[selected_task].name }} ({{ tasks[selected_task].points }} bodů)</h2>
+        <p>{{ tasks[selected_task].desc }}</p>
+
+        <form method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="task" value="{{ selected_task }}">
+
+            <label for="file_upload"><strong>1. Nahrát soubor s kódem (.c / .cpp):</strong></label>
+            <input type="file" name="file_upload" id="file_upload" accept=".c,.cpp">
+
+            <br><br>
+            <label for="code"><strong>2. Nebo vlož kód přímo sem:</strong></label>
+            <textarea name="code" id="code" placeholder="Vlož sem svůj C kód...">{{ user_code or '#include <stdio.h>\n\nint main(void) {\n    int a, b;\n    if (scanf("%d %d", &a, &b) == 2) {\n        printf("%d\\n", a + b);\n    }\n    return 0;\n}' }}</textarea>
+
+            <button type="submit">Odevzdat k otestování</button>
+        </form>
+    </div>
+
+    {% if result_output %}
+    <div class="card">
+        <h2>Výsledek hodnocení:</h2>
+        <pre>{{ result_output }}</pre>
+    </div>
+    {% endif %}
+
+</body>
+</html>

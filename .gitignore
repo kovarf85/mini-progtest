@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+*.pyc
+temp/solution.c
+user_*_out.txt
+compile_error.log
+student_bin 
