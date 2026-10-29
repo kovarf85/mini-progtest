@@ -21,14 +21,16 @@
         .badge-pending { background: #e74c3c; color: white; }
         .pts-tag { background: #f1c40f; color: #333; padding: 2px 6px; border-radius: 4px; font-size: 12px; margin-left: 5px; }
 
-        /* Styl pro ukázkové testy */
         .sample-box { display: flex; gap: 15px; margin: 15px 0; }
         .sample-col { flex: 1; }
         .sample-code { background: #272822; color: #f8f8f2; padding: 10px; border-radius: 5px; font-family: 'Courier New', Courier, monospace; margin-top: 5px; white-space: pre-wrap; }
 
-        input[type="file"], button { width: 100%; margin-top: 8px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
-        button { background-color: #3498db; color: white; font-weight: bold; border: none; cursor: pointer; margin-top: 15px; font-size: 16px; }
-        button:hover { background-color: #2980b9; }
+        .hint-card { border-left: 5px solid #f39c12; background: #fffbe6; }
+        select, input[type="file"], button { width: 100%; margin-top: 8px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; }
+        .btn-submit { background-color: #3498db; color: white; font-weight: bold; border: none; cursor: pointer; margin-top: 15px; font-size: 16px; }
+        .btn-submit:hover { background-color: #2980b9; }
+        .btn-hint { background-color: #f39c12; color: white; font-weight: bold; border: none; cursor: pointer; margin-top: 10px; }
+        .btn-hint:hover { background-color: #d35400; }
         pre.result-box { background-color: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 5px; overflow-x: auto; font-family: 'Courier New', Courier, monospace; }
     </style>
 </head>
@@ -63,10 +65,10 @@
         <h2>{{ tasks[selected_task].name }} ({{ tasks[selected_task].points }} bodů)</h2>
         <p>{{ tasks[selected_task].desc }}</p>
 
-        <!-- Ukázkové vstupy a výstupy -->
+        <!-- Ukázka v sjednoceném bloku -->
         <div class="sample-box">
             <div class="sample-col">
-            <strong>Ukázka práce programu (Výstupy jsou tučně):</strong>
+                <strong>Ukázka práce programu (vstupy jsou tučně):</strong>
                 <div class="sample-code">{{ tasks[selected_task].sample_combined | safe }}</div>
             </div>
         </div>
@@ -74,15 +76,51 @@
         <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
 
         <form method="POST" enctype="multipart/form-data">
+            <input type="hidden" name="action" value="upload">
             <input type="hidden" name="task" value="{{ selected_task }}">
 
             <label for="file_upload"><strong>Nahrát soubor s kódem (.c / .cpp):</strong></label>
             <input type="file" name="file_upload" id="file_upload" accept=".c,.cpp" required>
 
-            <button type="submit">Odevzdat k otestování</button>
+            <button type="submit" class="btn-submit">Odevzdat k otestování</button>
         </form>
     </div>
 
+    <!-- Sekce Nápovědy / Žolíka -->
+    {% if not user_results.get(selected_task) %}
+    <div class="card hint-card">
+        <h3>💡 Nápověda / Žolík pro tuto úlohu</h3>
+        {% if hint_data %}
+            <p><strong>Použitá nápověda pro test: <code>{{ hint_data.test_name }}</code></strong></p>
+            <div class="sample-box">
+                <div class="sample-col">
+                    <strong>Vstup (in.txt):</strong>
+                    <div class="sample-code">{{ hint_data.in }}</div>
+                </div>
+                <div class="sample-col">
+                    <strong>Očekávaný výstup (out.txt):</strong>
+                    <div class="sample-code">{{ hint_data.out }}</div>
+                </div>
+            </div>
+        {% else %}
+            <p>Máš k dispozici <strong>1 nápovědu</strong> pro tuto úlohu. Vyber testovací případ, u kterého chceš odkrýt vstup i výstup:</p>
+            <form method="POST">
+                <input type="hidden" name="action" value="use_hint">
+                <input type="hidden" name="task" value="{{ selected_task }}">
+                
+                <select name="selected_test" required>
+                    {% for test in available_tests %}
+                        <option value="{{ test }}">Testovací případ: {{ test }}</option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit" class="btn-hint">Odkrýt tento test jako nápovědu</button>
+            </form>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- Výsledek hodnocení -->
     {% if result_output %}
     <div class="card">
         <h2>Výsledek hodnocení:</h2>
