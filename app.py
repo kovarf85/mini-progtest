@@ -25,7 +25,7 @@ TASKS = {
     },
     "02_serazeni_pole": {
         "name": "Úloha 3: Seřazení čísel", 
-        "desc": "Napište program, který načte počet čísel N, následně N celých čísel a vytiskne je seřazená vzestupně.\nOšetřete nesprávné vstupy. Předávejte je na standartní výstup (Ne chybový) Nezapomeňte na bílé znaky na konci výpisů.",
+        "desc": "Napište program, který načte počet čísel N, následně N celých čísel a vytiskne je seřazená vzestupně.\nOšetřete nesprávné vstupy. Předávejte je na standartní výstup (Ne chybový). Nezapomeňte na bílé znaky na konci výpisů.",
         "points": 7,
         "sample_combined": "<b>Zadejte delku:</b>\n3\n<b>Zadejte cisla:</b>\n15 3 8\n<b>Serazena posloupnost:\n3 8 15</b>"
     }

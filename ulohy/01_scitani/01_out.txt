@@ -1,2 +1,2 @@
-Zadejte 2 vstupy:
+Zadejte 2 cisla:
 Soucet: 5
