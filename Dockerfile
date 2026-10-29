@@ -8,8 +8,8 @@ WORKDIR /app
 # Kopírování všech souborů projektu
 COPY . /app
 
-# Instalace Flasku
-RUN pip install --no-cache-dir flask
+# Instalace Flasku a databázového ovladače PostgreSQL
+RUN pip install --no-cache-dir flask psycopg2-binary
 
 # Zkompilování C testeru přímo v kontejneru
 RUN gcc tester.c -o tester
