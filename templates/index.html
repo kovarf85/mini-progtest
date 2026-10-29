@@ -66,12 +66,8 @@
         <!-- Ukázkové vstupy a výstupy -->
         <div class="sample-box">
             <div class="sample-col">
-                <strong>Ukázkový vstup (stdin):</strong>
-                <div class="sample-code">{{ tasks[selected_task].sample_in }}</div>
-            </div>
-            <div class="sample-col">
-                <strong>Ukázkový výstup (stdout):</strong>
-                <div class="sample-code">{{ tasks[selected_task].sample_out }}</div>
+            <strong>Ukázka práce programu (vstupy jsou tučně):</strong>
+                <div class="sample-code">{{ tasks[selected_task].sample_combined | safe }}</div>
             </div>
         </div>
 

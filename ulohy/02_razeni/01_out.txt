@@ -1,0 +1,5 @@
+Zadejte delku:
+Zadejte cisla:
+Serazena posloupnost:
+-15 -3 0 7 8 12 19 23 31 42 51 64 77 88 95
+

@@ -1,0 +1,3 @@
+Zadejte delku:
+Zadejte cisla:
+Nespravny vstup.

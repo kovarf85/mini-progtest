@@ -19,11 +19,16 @@ USERS = {
 TASKS = {
     "01_scitani": {
         "name": "Úloha 1: Sčítání dvou čísel", 
-        "desc": "Napište program, který načte dvě celá čísla ze stdin a vytiskne jejich součet.",
+        "desc": "Napište program, který vyzve k zadání dvoch celých čísel ze stdin a vytiskne jejich součet.",
         "points": 3,
-        "sample_in": "5 10",
-        "sample_out": "15"
+        "sample_combined": "Zadejte dve cisla:\n<b>5 10</b>\nSoucet: 15"
     },
+    "02_serazeni_pole": {
+        "name": "Úloha 3: Seřazení čísel", 
+        "desc": "Napište program, který načte počet čísel N, následně N celých čísel a vytiskne je seřazená vzestupně.\nOšetřete nesprávné vstupy. Předávejte je na standartní výstup (Ne chybový) Nezapomeňte na bílé znaky na konci výpisů.",
+        "points": 5,
+        "sample_combined": "Zadejte delku:\n<b>3</b>\nZadejte cisla:\n<b>15 3 8</b>\nSerazena posloupnost:\n3 8 15"
+    }
 }
 
 def init_db():
