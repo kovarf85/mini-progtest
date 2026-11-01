@@ -233,7 +233,7 @@ def index():
                         ["./tester", temp_code_path, tests_dir],
                         capture_output=True,
                         text=True,
-                        timeout=15
+                        timeout=30
                     )
                     result_output = process.stdout
                     is_passed = "100%" in result_output

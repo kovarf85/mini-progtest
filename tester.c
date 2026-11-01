@@ -53,14 +53,14 @@ int main(int argc, char *argv[]) {
 
         total_basic++;
 
-        // Ochrana: timeout 2s zabije zamrzlý program
+        // Timeout nastaven na 5 sekund
         char cmd[512];
-        snprintf(cmd, sizeof(cmd), "timeout 2s /app/temp/compiled_prog < %s > %s 2>&1", in_path, my_out_path);
+        snprintf(cmd, sizeof(cmd), "timeout 5s /app/temp/compiled_prog < %s > %s 2>&1", in_path, my_out_path);
         int run_res = system(cmd);
 
         if (run_res != 0) {
             printf("\n----------------------------------------\n");
-            printf("[FAIL] Test %02d: TIMEOUT / CHYBA BĚHU (překročen časový limit 2s)\n", i);
+            printf("[FAIL] Test %02d: TIMEOUT / CHYBA BĚHU (překročen časový limit 5s)\n", i);
             printf("----------------------------------------\n");
             printf(">>> VSTUP (in.txt):\n");
             print_file_content(in_path);
@@ -113,13 +113,14 @@ int main(int argc, char *argv[]) {
 
             total_bonus++;
 
+            // Timeout nastaven na 5 sekund i pro bonusy
             char cmd[512];
-            snprintf(cmd, sizeof(cmd), "timeout 3s /app/temp/compiled_prog < %s > %s 2>&1", in_path, my_out_path);
+            snprintf(cmd, sizeof(cmd), "timeout 5s /app/temp/compiled_prog < %s > %s 2>&1", in_path, my_out_path);
             int run_res = system(cmd);
 
             if (run_res != 0) {
                 printf("\n----------------------------------------\n");
-                printf("[FAIL] Test %02d (BONUS): TIMEOUT (překročen časový limit 3s)\n", i);
+                printf("[FAIL] Test %02d (BONUS): TIMEOUT (překročen časový limit 5s)\n", i);
                 printf("----------------------------------------\n\n");
                 continue;
             }
