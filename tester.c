@@ -40,7 +40,7 @@ int main(int argc, char *argv[]) {
 
     printf("=== ZÁKLADNÍ TESTY ===\n");
 
-    // 2. FÁZE: Pouze základní testy (00 až 09)
+    // 2. FÁZE: Základní testy (00 až 09)
     for (int i = 0; i < 10; i++) {
         char in_path[256], out_path[256], my_out_path[256];
         snprintf(in_path, sizeof(in_path), "%s/%02d_in.txt", tests_dir, i);
@@ -48,17 +48,26 @@ int main(int argc, char *argv[]) {
         snprintf(my_out_path, sizeof(my_out_path), "/app/temp/my_out_%02d.txt", i);
 
         FILE *f_in = fopen(in_path, "r");
-        if (!f_in) continue; // test neexistuje
+        if (!f_in) continue;
         fclose(f_in);
 
         total_basic++;
 
-        // Spuštění studentova programu
+        // Ochrana: timeout 2s zabije zamrzlý program
         char cmd[512];
-        snprintf(cmd, sizeof(cmd), "/app/temp/compiled_prog < %s > %s 2>&1", in_path, my_out_path);
-        system(cmd);
+        snprintf(cmd, sizeof(cmd), "timeout 2s /app/temp/compiled_prog < %s > %s 2>&1", in_path, my_out_path);
+        int run_res = system(cmd);
 
-        // Porovnání výstupů
+        if (run_res != 0) {
+            printf("\n----------------------------------------\n");
+            printf("[FAIL] Test %02d: TIMEOUT / CHYBA BĚHU (překročen časový limit 2s)\n", i);
+            printf("----------------------------------------\n");
+            printf(">>> VSTUP (in.txt):\n");
+            print_file_content(in_path);
+            printf("----------------------------------------\n\n");
+            continue;
+        }
+
         snprintf(cmd, sizeof(cmd), "diff -b -B %s %s > /dev/null", out_path, my_out_path);
         int diff_res = system(cmd);
 
@@ -99,14 +108,21 @@ int main(int argc, char *argv[]) {
             snprintf(my_out_path, sizeof(my_out_path), "/app/temp/my_out_%02d.txt", i);
 
             FILE *f_in = fopen(in_path, "r");
-            if (!f_in) continue; // bonus neexistuje
+            if (!f_in) continue;
             fclose(f_in);
 
             total_bonus++;
 
             char cmd[512];
-            snprintf(cmd, sizeof(cmd), "/app/temp/compiled_prog < %s > %s 2>&1", in_path, my_out_path);
-            system(cmd);
+            snprintf(cmd, sizeof(cmd), "timeout 3s /app/temp/compiled_prog < %s > %s 2>&1", in_path, my_out_path);
+            int run_res = system(cmd);
+
+            if (run_res != 0) {
+                printf("\n----------------------------------------\n");
+                printf("[FAIL] Test %02d (BONUS): TIMEOUT (překročen časový limit 3s)\n", i);
+                printf("----------------------------------------\n\n");
+                continue;
+            }
 
             snprintf(cmd, sizeof(cmd), "diff -b -B %s %s > /dev/null", out_path, my_out_path);
             int diff_res = system(cmd);
