@@ -29,13 +29,13 @@ TASKS = {
         "desc": "Napište program, který načte počet čísel N, následně N celých čísel a vytiskne je seřazená vzestupně.\nOšetřete nesprávné vstupy. Předávejte je na standartní výstup (Ne chybový). Nezapomeňte na bílé znaky na konci výpisů.",
         "points": 7,
         "sample_combined": "<b>Zadejte delku:</b>\n3\n<b>Zadejte cisla:</b>\n15 3 8\n<b>Serazena posloupnost:\n3 8 15</b>"
-    }
+    },
     "03_hotel": {
         "name": "Úloha 3: HOTEL (Final boss)", 
         "desc": "Napište program, který načte čas a cenu za minutu, spočítá, kolik budete platit za pobyt mezi časovými úseky a spočítá, jak dlouho můžete v hotelu být s určitým počtem peněz",
         "points": 20,
         "sample_combined": "<b>Operace:</b>\n<b>+ 2026-01-01 11:00, 70</b>\n<b>+ 2026-01-01 12:00, 80</b>\n<b>$ 2026-01-01 12:00, 2026-01-01 12:05</b>\n400\n<b># 2026-01-01 12:00, 500</b>\n2026-01-01 12:06, 480\n<b>+ 2026-01-01 12:02, 90</b>\n<b>$ 2026-01-01 12:00, 2026-01-01 12:05</b>\n430\n<b># 2026-01-01 12:00, 500</b>\n2026-01-01 12:05, 430\n<b>+ 2026-01-01 12:04, 100</b>\n<b>$ 2026-01-01 12:00, 2026-01-01 12:05</b>\n440\n<b># 2026-01-01 12:00, 500</b>\n2026-01-01 12:05, 440\n<b>$ 2026-01-01 10:59, 2026-01-01 12:01</b>\nN/A\n<b># 2026-01-01 10:59, 500</b>\nN/A"
-    },
+    }
 }
 
 def init_db():
