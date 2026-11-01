@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
     }
 
     int percentage = (passed_tests * 100) / total_tests;
-    printf("\nVysledek: %d%% (%d/%d testu prosklo)\n", percentage, passed_tests, total_tests);
+    printf("\nVysledek: %d%% (%d/%d testu proslo)\n", percentage, passed_tests, total_tests);
 
     return 0;
 }
