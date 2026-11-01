@@ -16,11 +16,11 @@ void print_file_content(const char *path) {
     fclose(f);
 }
 
-// Pomocná funkce pro získání reálného času v milisekundách
-double get_time_ms() {
+// Pomocná funkce pro získání reálného času v sekundách
+double get_time_sec() {
     struct timespec ts;
     clock_gettime(CLOCK_MONOTONIC, &ts);
-    return (double)ts.tv_sec * 1000.0 + (double)ts.tv_nsec / 1000000.0;
+    return (double)ts.tv_sec + (double)ts.tv_nsec / 1e9;
 }
 
 int main(int argc, char *argv[]) {
@@ -61,17 +61,17 @@ int main(int argc, char *argv[]) {
 
         total_basic++;
 
-        double start = get_time_ms();
+        double start = get_time_sec();
 
         char cmd[512];
         snprintf(cmd, sizeof(cmd), "timeout 5s /app/temp/compiled_prog < %s > %s 2>&1", in_path, my_out_path);
         int run_res = system(cmd);
 
-        double elapsed_ms = get_time_ms() - start;
+        double elapsed_sec = get_time_sec() - start;
 
         if (run_res != 0) {
             printf("\n----------------------------------------\n");
-            printf("[FAIL] Test %02d: TIMEOUT / CHYBA BĚHU (překročen časový limit 5s, %.0f ms)\n", i, elapsed_ms);
+            printf("[FAIL] Test %02d: TIMEOUT / CHYBA BĚHU (překročen limit 5s, %.2f s)\n", i, elapsed_sec);
             printf("----------------------------------------\n");
             printf(">>> VSTUP (in.txt):\n");
             print_file_content(in_path);
@@ -84,10 +84,10 @@ int main(int argc, char *argv[]) {
 
         if (diff_res == 0) {
             passed_basic++;
-            printf("[OK] Test %02d: SUCCESS (%.0f ms)\n", i, elapsed_ms);
+            printf("[OK] Test %02d: SUCCESS (%.2f s)\n", i, elapsed_sec);
         } else {
             printf("\n----------------------------------------\n");
-            printf("[FAIL] Test %02d: FAILED (%.0f ms)\n", i, elapsed_ms);
+            printf("[FAIL] Test %02d: FAILED (%.2f s)\n", i, elapsed_sec);
             printf("----------------------------------------\n");
             printf(">>> VSTUP (in.txt):\n");
             print_file_content(in_path);
@@ -108,7 +108,7 @@ int main(int argc, char *argv[]) {
     printf("\n========================================\n");
     printf("Základní testy: %d%% (%d/%d testů)\n", percentage, passed_basic, total_basic);
 
-    // 3. FÁZE: Bonusy spustíme JEN POKUD má základ na 100 %
+    // 3. FÁZE: Bonusové testy (od 10 výše)
     if (percentage == 100) {
         printf("\n=== BONUSOVÉ TESTY ===\n");
 
@@ -124,17 +124,17 @@ int main(int argc, char *argv[]) {
 
             total_bonus++;
 
-            double start = get_time_ms();
+            double start = get_time_sec();
 
             char cmd[512];
             snprintf(cmd, sizeof(cmd), "timeout 5s /app/temp/compiled_prog < %s > %s 2>&1", in_path, my_out_path);
             int run_res = system(cmd);
 
-            double elapsed_ms = get_time_ms() - start;
+            double elapsed_sec = get_time_sec() - start;
 
             if (run_res != 0) {
                 printf("\n----------------------------------------\n");
-                printf("[FAIL] Test %02d (BONUS): TIMEOUT (překročen časový limit 5s, %.0f ms)\n", i, elapsed_ms);
+                printf("[FAIL] Test %02d (BONUS): TIMEOUT / CHYBA BĚHU (překročen limit 5s, %.2f s)\n", i, elapsed_sec);
                 printf("----------------------------------------\n\n");
                 continue;
             }
@@ -144,10 +144,10 @@ int main(int argc, char *argv[]) {
 
             if (diff_res == 0) {
                 passed_bonus++;
-                printf("[OK] Test %02d (BONUS): SUCCESS (%.0f ms)\n", i, elapsed_ms);
+                printf("[OK] Test %02d (BONUS): SUCCESS (%.2f s)\n", i, elapsed_sec);
             } else {
                 printf("\n----------------------------------------\n");
-                printf("[FAIL] Test %02d (BONUS): FAILED (%.0f ms)\n", i, elapsed_ms);
+                printf("[FAIL] Test %02d (BONUS): FAILED (%.2f s)\n", i, elapsed_sec);
                 printf("----------------------------------------\n");
                 printf(">>> VSTUP (in.txt):\n");
                 print_file_content(in_path);
