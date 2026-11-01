@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 void print_file_content(const char *path) {
     FILE *f = fopen(path, "r");
@@ -53,14 +54,19 @@ int main(int argc, char *argv[]) {
 
         total_basic++;
 
-        // Timeout nastaven na 5 sekund
+        // Měření času běhu testu
+        clock_t start = clock();
+
         char cmd[512];
         snprintf(cmd, sizeof(cmd), "timeout 5s /app/temp/compiled_prog < %s > %s 2>&1", in_path, my_out_path);
         int run_res = system(cmd);
 
+        clock_t end = clock();
+        double elapsed_ms = ((double)(end - start) / CLOCKS_PER_SEC) * 1000.0;
+
         if (run_res != 0) {
             printf("\n----------------------------------------\n");
-            printf("[FAIL] Test %02d: TIMEOUT / CHYBA BĚHU (překročen časový limit 5s)\n", i);
+            printf("[FAIL] Test %02d: TIMEOUT / CHYBA BĚHU (překročen časový limit 5s, %.0f ms)\n", i, elapsed_ms);
             printf("----------------------------------------\n");
             printf(">>> VSTUP (in.txt):\n");
             print_file_content(in_path);
@@ -73,10 +79,10 @@ int main(int argc, char *argv[]) {
 
         if (diff_res == 0) {
             passed_basic++;
-            printf("[OK] Test %02d: SUCCESS\n", i);
+            printf("[OK] Test %02d: SUCCESS (%.0f ms)\n", i, elapsed_ms);
         } else {
             printf("\n----------------------------------------\n");
-            printf("[FAIL] Test %02d: FAILED\n", i);
+            printf("[FAIL] Test %02d: FAILED (%.0f ms)\n", i, elapsed_ms);
             printf("----------------------------------------\n");
             printf(">>> VSTUP (in.txt):\n");
             print_file_content(in_path);
@@ -113,14 +119,18 @@ int main(int argc, char *argv[]) {
 
             total_bonus++;
 
-            // Timeout nastaven na 5 sekund i pro bonusy
+            clock_t start = clock();
+
             char cmd[512];
             snprintf(cmd, sizeof(cmd), "timeout 5s /app/temp/compiled_prog < %s > %s 2>&1", in_path, my_out_path);
             int run_res = system(cmd);
 
+            clock_t end = clock();
+            double elapsed_ms = ((double)(end - start) / CLOCKS_PER_SEC) * 1000.0;
+
             if (run_res != 0) {
                 printf("\n----------------------------------------\n");
-                printf("[FAIL] Test %02d (BONUS): TIMEOUT (překročen časový limit 5s)\n", i);
+                printf("[FAIL] Test %02d (BONUS): TIMEOUT (překročen časový limit 5s, %.0f ms)\n", i, elapsed_ms);
                 printf("----------------------------------------\n\n");
                 continue;
             }
@@ -130,10 +140,10 @@ int main(int argc, char *argv[]) {
 
             if (diff_res == 0) {
                 passed_bonus++;
-                printf("[OK] Test %02d (BONUS): SUCCESS\n", i);
+                printf("[OK] Test %02d (BONUS): SUCCESS (%.0f ms)\n", i, elapsed_ms);
             } else {
                 printf("\n----------------------------------------\n");
-                printf("[FAIL] Test %02d (BONUS): FAILED\n", i);
+                printf("[FAIL] Test %02d (BONUS): FAILED (%.0f ms)\n", i, elapsed_ms);
                 printf("----------------------------------------\n");
                 printf(">>> VSTUP (in.txt):\n");
                 print_file_content(in_path);
