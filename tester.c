@@ -16,6 +16,13 @@ void print_file_content(const char *path) {
     fclose(f);
 }
 
+// Pomocná funkce pro získání reálného času v milisekundách
+double get_time_ms() {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (double)ts.tv_sec * 1000.0 + (double)ts.tv_nsec / 1000000.0;
+}
+
 int main(int argc, char *argv[]) {
     if (argc < 3) {
         printf("Pouziti: ./tester <c_soubor> <složka_s_testy>\n");
@@ -54,15 +61,13 @@ int main(int argc, char *argv[]) {
 
         total_basic++;
 
-        // Měření času běhu testu
-        clock_t start = clock();
+        double start = get_time_ms();
 
         char cmd[512];
         snprintf(cmd, sizeof(cmd), "timeout 5s /app/temp/compiled_prog < %s > %s 2>&1", in_path, my_out_path);
         int run_res = system(cmd);
 
-        clock_t end = clock();
-        double elapsed_ms = ((double)(end - start) / CLOCKS_PER_SEC) * 1000.0;
+        double elapsed_ms = get_time_ms() - start;
 
         if (run_res != 0) {
             printf("\n----------------------------------------\n");
@@ -119,14 +124,13 @@ int main(int argc, char *argv[]) {
 
             total_bonus++;
 
-            clock_t start = clock();
+            double start = get_time_ms();
 
             char cmd[512];
             snprintf(cmd, sizeof(cmd), "timeout 5s /app/temp/compiled_prog < %s > %s 2>&1", in_path, my_out_path);
             int run_res = system(cmd);
 
-            clock_t end = clock();
-            double elapsed_ms = ((double)(end - start) / CLOCKS_PER_SEC) * 1000.0;
+            double elapsed_ms = get_time_ms() - start;
 
             if (run_res != 0) {
                 printf("\n----------------------------------------\n");
