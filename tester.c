@@ -1,185 +1,90 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <sys/wait.h>
-#include <fcntl.h>
-#include <signal.h>
 #include <dirent.h>
 
-#define TIMEOUT_SECONDS 10
-#define MAX_TESTS 10
-
-static pid_t child_pid = -1;
-
-void handle_timeout(int sig) {
-    (void)sig;
-    if (child_pid > 0) {
-        kill(child_pid, SIGKILL);
+void print_file_content(const char *path) {
+    FILE *f = fopen(path, "r");
+    if (!f) {
+        printf("(soubor nenalezen)\n");
+        return;
     }
-}
-
-typedef enum {
-    RESULT_OK = 0,
-    RESULT_WA,   // Wrong Answer
-    RESULT_TLE,  // Time Limit Exceeded
-    RESULT_RTE   // Runtime Error
-} TestStatus;
-
-// 1. Kompilace studentova kódu
-int compile_student_code(const char *source_file, const char *binary_out) {
-    pid_t pid = fork();
-    if (pid == 0) {
-        // Přesměrujeme chybový výstup g++ do souboru, abychom mohli ukázat chybu kompilace
-        int err_fd = open("compile_error.log", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-        if (err_fd >= 0) {
-            dup2(err_fd, STDERR_FILENO);
-            close(err_fd);
-        }
-        execlp("gcc", "gcc", "-Wall", source_file, "-o", binary_out, NULL);
-        exit(1);
+    char ch;
+    while ((ch = fgetc(f)) != EOF) {
+        putchar(ch);
     }
-
-    int status;
-    waitpid(pid, &status, 0);
-    return (WIFEXITED(status) && WEXITSTATUS(status) == 0);
-}
-
-// 2. Spuštění jednoho testu s časovým limitem
-TestStatus run_single_test(const char *binary, const char *in_file, const char *user_out_file) {
-    child_pid = fork();
-
-    if (child_pid == 0) {
-        // Přesměrování stdin
-        int in_fd = open(in_file, O_RDONLY);
-        if (in_fd < 0) exit(1);
-        dup2(in_fd, STDIN_FILENO);
-        close(in_fd);
-
-        // Přesměrování stdout
-        int out_fd = open(user_out_file, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-        if (out_fd < 0) exit(1);
-        dup2(out_fd, STDOUT_FILENO);
-        close(out_fd);
-
-        execl(binary, binary, NULL);
-        exit(1);
-    }
-
-    // Nastavení timeoutu
-    struct sigaction sa;
-    memset(&sa, 0, sizeof(sa));
-    sa.sa_handler = handle_timeout;
-    sigaction(SIGALRM, &sa, NULL);
-
-    alarm(TIMEOUT_SECONDS);
-    int status;
-    waitpid(child_pid, &status, 0);
-    alarm(0); // Zrušení budíku
-
-    if (WIFSIGNALED(status)) {
-        if (WTERMSIG(status) == SIGKILL) {
-            return RESULT_TLE;
-        }
-        return RESULT_RTE;
-    }
-
-    if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
-        return RESULT_OK;
-    }
-
-    return RESULT_RTE;
-}
-
-// 3. Porovnání výstupu studenta s očekávaným výstupem
-int compare_outputs(const char *user_out, const char *expected_out) {
-    pid_t pid = fork();
-    if (pid == 0) {
-        int dev_null = open("/dev/null", O_WRONLY);
-        dup2(dev_null, STDOUT_FILENO);
-        close(dev_null);
-
-        // Porovnání pomocí 'diff -w' (ignoruje bílé znaky na konci řádků)
-        execlp("diff", "diff", "-w", user_out, expected_out, NULL);
-        exit(1);
-    }
-
-    int status;
-    waitpid(pid, &status, 0);
-    return (WIFEXITED(status) && WEXITSTATUS(status) == 0);
+    fclose(f);
 }
 
 int main(int argc, char *argv[]) {
-    const char *source = (argc > 1) ? argv[1] : "solution.c";
-    const char *tests_dir = (argc > 2) ? argv[2] : "."; // Výchozí je aktuální složka
-    const char *binary = "./student_bin";
-
-    printf("\n==========================================\n");
-    printf("         MINI PROGTEST EVALUATOR          \n");
-    printf("==========================================\n");
-    printf("Hodnocený soubor: %s\n", source);
-    printf("Složka s testy:   %s\n\n", tests_dir);
-
-    // 1. Kompilace
-    printf("[1] Kompilace kódu... ");
-    fflush(stdout);
-    if (!compile_student_code(source, binary)) {
-        printf("COMPILATION ERROR!\n");
-        system("cat compile_error.log");
+    if (argc < 3) {
+        printf("Pouziti: ./tester <c_soubor> <složka_s_testy>\n");
         return 1;
     }
-    printf("OK\n\n");
 
-    // 2. Procházení a spouštění testů
-    printf("[2] Testování:\n");
-    int passed_count = 0;
+    const char *solution = argv[1];
+    const char *tests_dir = argv[2];
+
+    // 1. Kompilace C programu
+    int compile_res = system("gcc -Wall -pedantic /app/temp/solution.c -o /app/temp/compiled_prog 2> /app/temp/compile_err.txt");
+    if (compile_res != 0) {
+        printf("--- CHYBA KOMPILACE ---\n");
+        print_file_content("/app/temp/compile_err.txt");
+        return 0;
+    }
+
+    // 2. Procházení testovacích souborů
     int total_tests = 0;
+    int passed_tests = 0;
 
-    for (int i = 0; i < MAX_TESTS; i++) {
-        char in_file[256], exp_out_file[256], user_out_file[256];
-        
-        snprintf(in_file, sizeof(in_file), "%s/%02d_in.txt", tests_dir, i);
-        snprintf(exp_out_file, sizeof(exp_out_file), "%s/%02d_out.txt", tests_dir, i);
-        snprintf(user_out_file, sizeof(user_out_file), "user_%02d_out.txt", i);
+    for (int i = 0; i < 100; i++) {
+        char in_path[256], out_path[256], my_out_path[256];
+        snprintf(in_path, sizeof(in_path), "%s/%02d_in.txt", tests_dir, i);
+        snprintf(out_path, sizeof(out_path), "%s/%02d_out.txt", tests_dir, i);
+        snprintf(my_out_path, sizeof(my_out_path), "/app/temp/my_out_%02d.txt", i);
 
-        // Zkontrolujeme, zda test s tímto číslem existuje
-        if (access(in_file, F_OK) != 0 || access(exp_out_file, F_OK) != 0) {
-            break; // Žádný další test ve složce není
-        }
+        FILE *f_in = fopen(in_path, "r");
+        if (!f_in) continue; // test neexistuje, přeskočíme
+        fclose(f_in);
 
         total_tests++;
-        printf("  Test %02d: ", i);
-        fflush(stdout);
 
-        TestStatus status = run_single_test(binary, in_file, user_out_file);
+        // Spuštění studentova programu s daným vstupem
+        char cmd[512];
+        snprintf(cmd, sizeof(cmd), "/app/temp/compiled_prog < %s > %s 2>&1", in_path, my_out_path);
+        system(cmd);
 
-        if (status == RESULT_OK) {
-            if (compare_outputs(user_out_file, exp_out_file)) {
-                printf("SUCCESS (OK)\n");
-                passed_count++;
-            } else {
-                printf("WRONG ANSWER (Chybný výstup)\n");
-            }
-        } else if (status == RESULT_TLE) {
-            printf("TIME LIMIT EXCEEDED (>%ds)\n", TIMEOUT_SECONDS);
+        // Porovnání výstupů pomocí 'diff'
+        snprintf(cmd, sizeof(cmd), "diff -b -B %s %s > /dev/null", out_path, my_out_path);
+        int diff_res = system(cmd);
+
+        if (diff_res == 0) {
+            passed_tests++;
+            printf("[OK] Test %02d: SUCCESS\n", i);
         } else {
-            printf("RUNTIME ERROR (Program spadl)\n");
+            printf("\n----------------------------------------\n");
+            printf("[FAIL] Test %02d: FAILED\n", i);
+            printf("----------------------------------------\n");
+            
+            printf(">>> VSTUP (in.txt):\n");
+            print_file_content(in_path);
+            
+            printf("\n>>> OČEKÁVANÝ VÝSTUP (out.txt):\n");
+            print_file_content(out_path);
+            
+            printf("\n>>> TVŮJ VÝSTUP:\n");
+            print_file_content(my_out_path);
+            printf("----------------------------------------\n\n");
         }
-
-        unlink(user_out_file);
     }
 
     if (total_tests == 0) {
-        printf("  Nebyly nalezeny žádné testovací soubory (%s/00_in.txt)!\n", tests_dir);
-    } else {
-        printf("\n==========================================\n");
-        printf("VÝSLEDEK: %d / %d testů prošlo (%.0f%%)\n", 
-               passed_count, total_tests, (float)passed_count / total_tests * 100);
-        printf("==========================================\n\n");
+        printf("Zadne testy nebyly nalezeny ve slozce: %s\n", tests_dir);
+        return 0;
     }
 
-    unlink(binary);
-    unlink("compile_error.log");
+    int percentage = (passed_tests * 100) / total_tests;
+    printf("\nVysledek: %d%% (%d/%d testu prosklo)\n", percentage, passed_tests, total_tests);
 
     return 0;
 }
